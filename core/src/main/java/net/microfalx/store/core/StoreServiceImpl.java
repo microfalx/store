@@ -10,8 +10,6 @@ import net.microfalx.store.api.StoreFactory;
 import net.microfalx.store.api.StoreService;
 import net.microfalx.threadpool.AbstractRunnable;
 import net.microfalx.threadpool.ThreadPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -31,15 +29,22 @@ import static net.microfalx.lang.StringUtils.toIdentifier;
 @Slf4j
 public class StoreServiceImpl implements StoreService, Initializable, Releasable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StoreServiceImpl.class);
-
-    private StoreSettings properties = new StoreSettings();
+    private volatile StoreSettings settings = new StoreSettings();
 
     private ThreadPool threadPool = ThreadPool.get();
 
     private StoreFactory<?, ?> storeFactory;
     private volatile Resource directory;
     private final Map<String, Store<?, ?>> stores = new ConcurrentHashMap<>();
+
+    public StoreSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(StoreSettings settings) {
+        requireNonNull(settings);
+        this.settings = settings;
+    }
 
     public ThreadPool getThreadPool() {
         if (threadPool == null) threadPool = ThreadPool.get();
@@ -174,7 +179,7 @@ public class StoreServiceImpl implements StoreService, Initializable, Releasable
         public void run() {
             for (Store<?, ?> store : stores.values()) {
                 try {
-                    if (store.size(Store.Location.MEMORY) > properties.getMaximumMemorySize()) {
+                    if (store.size(Store.Location.MEMORY) > settings.getMaximumMemorySize()) {
                         store.flush();
                     }
                 } catch (Exception e) {

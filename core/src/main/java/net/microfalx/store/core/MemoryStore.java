@@ -2,7 +2,11 @@ package net.microfalx.store.core;
 
 import com.google.common.collect.AbstractIterator;
 import net.microfalx.lang.Identifiable;
+import net.microfalx.lang.annotation.Order;
+import net.microfalx.lang.annotation.Provider;
 import net.microfalx.resource.Resource;
+import net.microfalx.store.api.Store;
+import net.microfalx.store.api.StoreFactory;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -11,11 +15,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static net.microfalx.store.core.StoreUtils.getTimer;
 
-public class TestStore<T extends Identifiable<ID>, ID> extends AbstractStore<T, ID> {
+public class MemoryStore<T extends Identifiable<ID>, ID> extends AbstractStore<T, ID> {
 
     private final Map<ID, byte[]> data = new ConcurrentHashMap<>();
 
-    public TestStore(Options options, Resource resource) {
+    public MemoryStore(Options options, Resource resource) {
         super(options, resource);
     }
 
@@ -74,7 +78,7 @@ public class TestStore<T extends Identifiable<ID>, ID> extends AbstractStore<T, 
 
         @Override
         protected T computeNext() {
-            return getTimer("Next", TestStore.this).record(() -> {
+            return getTimer("Next", MemoryStore.this).record(() -> {
                 if (!iterator.hasNext()) {
                     endOfData();
                     return null;
@@ -84,5 +88,15 @@ public class TestStore<T extends Identifiable<ID>, ID> extends AbstractStore<T, 
             });
         }
 
+    }
+
+    @Provider
+    @Order(Order.AFTER)
+    public static class Factory<T extends Identifiable<ID>, ID> implements StoreFactory<T, ID> {
+
+        @Override
+        public Store<T, ID> create(Store.Options options, Resource directory) {
+            return new MemoryStore<>(options, directory);
+        }
     }
 }

@@ -11,6 +11,10 @@ import java.util.Collection;
  */
 public interface StoreService extends Service {
 
+    static StoreService getInstance() {
+        return Service.lookup(StoreService.class);
+    }
+
     /**
      * Returns the store factory.
      *
