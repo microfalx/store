@@ -1,43 +1,54 @@
-package net.microfalx.store.rocksdb;
+package net.microfalx.store.mapdb;
 
 import com.google.common.collect.AbstractIterator;
 import lombok.extern.slf4j.Slf4j;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.ObjectUtils;
-import net.microfalx.resource.FileResource;
 import net.microfalx.resource.Resource;
-import net.microfalx.resource.rocksdb.RocksDbManager;
+import net.microfalx.resource.ResourceUtils;
 import net.microfalx.store.api.StoreException;
 import net.microfalx.store.core.AbstractStore;
-import org.rocksdb.*;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static net.microfalx.lang.ArgumentUtils.requireNonNull;
-import static net.microfalx.store.core.StoreUtils.METRICS_FAILURES;
 import static net.microfalx.store.core.StoreUtils.getTimer;
 
 @Slf4j
 public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, ID> {
 
-    private final RocksDB db;
+    private static final String DEFAULT_MAP = "default";
+
+    private final DB db;
+    private final Map<String, byte[]> map;
 
     public StoreImpl(Options options, Resource resource) {
         super(options, resource);
-        this.db = RocksDbManager.getInstance().create(((FileResource) resource.toFile()).getFile());
+        this.db = DBMaker.fileDB(ResourceUtils.toFile(resource))
+                .fileMmapEnableIfSupported()
+                .fileMmapPreclearDisable()
+                .transactionEnable()
+                .make();
+        this.map = initDefaultMap();
     }
 
-    public StoreImpl(Options options, Resource resource, RocksDB db) {
+    public StoreImpl(Options options, Resource resource, DB db) {
         super(options, resource);
         requireNonNull(db);
         this.db = db;
+        this.map = initDefaultMap();
     }
 
     @Override
     protected void doRemove(ID id) {
         try {
-            db.delete(ObjectUtils.toString(id).getBytes());
+            String idAsString = ObjectUtils.toString(id);
+            this.map.remove(idAsString);
         } catch (Exception e) {
             throw new StoreException("Failed to remove item " + id + "'", e);
         }
@@ -47,8 +58,8 @@ public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, 
     public long count(Location location) {
         requireNonNull(location);
         return switch (location) {
-            case MEMORY -> RocksDbManager.getMemoryCount(db);
-            case DISK -> RocksDbManager.getDiskCount(db);
+            case MEMORY -> 0L;
+            case DISK -> this.map.size();
         };
     }
 
@@ -56,29 +67,33 @@ public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, 
     public long size(Location location) {
         requireNonNull(location);
         return switch (location) {
-            case MEMORY -> RocksDbManager.getMemorySize(db);
-            case DISK -> RocksDbManager.getDiskSize(db);
+            case MEMORY -> 0L;
+            case DISK -> {
+                try {
+                    yield getResource().length();
+                } catch (Exception e) {
+                    yield -1L;
+                }
+            }
         };
     }
 
     @Override
     protected byte[] doReadData(ID id) throws Exception {
         String idAsString = ObjectUtils.toString(id);
-        ReadOptions options = new ReadOptions();
-        return db.get(options, idAsString.getBytes());
+        return this.map.get(idAsString);
     }
 
     @Override
     protected void doWriteData(ID id, byte[] data) throws Exception {
         String idAsString = ObjectUtils.toString(id);
-        WriteOptions options = new WriteOptions();
-        db.put(options, idAsString.getBytes(), data);
+        this.map.put(idAsString, data);
     }
 
     @Override
     protected void doFlush(AtomicLong count) {
         try {
-            db.flush(new FlushOptions().setWaitForFlush(true));
+            // no flush needed for mapdb
         } catch (Exception e) {
             LOGGER.warn("Failed to close the ");
         }
@@ -86,17 +101,8 @@ public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, 
 
     @Override
     protected void doClear(AtomicLong count) {
-        RocksIterator iterator = db.newIterator();
-        iterator.seekToFirst();
-        while (iterator.isValid()) {
-            count.incrementAndGet();
-            try {
-                db.delete(iterator.key());
-            } catch (RocksDBException e) {
-                METRICS_FAILURES.count(getName());
-            }
-            iterator.next();
-        }
+        count.addAndGet(this.map.size());
+        this.map.clear();
     }
 
     @Override
@@ -113,25 +119,30 @@ public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, 
         return new IteratorImpl();
     }
 
+    private Map<String, byte[]> initDefaultMap() {
+        DB.HashMapMaker<String, byte[]> mapMaker = db.hashMap(DEFAULT_MAP)
+                .keySerializer(Serializer.STRING)
+                .valueSerializer(Serializer.BYTE_ARRAY)
+                .counterEnable();
+        return mapMaker.createOrOpen();
+    }
+
     private class IteratorImpl extends AbstractIterator<T> {
 
-        private final RocksIterator iterator;
+        private final Iterator<byte[]> iterator;
 
         public IteratorImpl() {
-            iterator = db.newIterator();
-            iterator.seekToFirst();
+            iterator = map.values().iterator();
         }
 
         @Override
         protected T computeNext() {
             return getTimer("Next", StoreImpl.this).record(() -> {
-                if (!iterator.isValid()) {
+                if (!iterator.hasNext()) {
                     endOfData();
                     return null;
                 } else {
-                    T value = deserialize(iterator.value());
-                    iterator.next();
-                    return value;
+                    return deserialize(iterator.next());
                 }
             });
         }

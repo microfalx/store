@@ -62,7 +62,7 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
     }
 
     @Override
-    public Resource getDirectory() {
+    public Resource getResource() {
         return resource;
     }
 

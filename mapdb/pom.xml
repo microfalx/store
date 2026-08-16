@@ -22,7 +22,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>store-rocksdb</artifactId>
+    <artifactId>store-mapdb</artifactId>
 
     <parent>
         <groupId>net.microfalx.store</groupId>
@@ -30,8 +30,8 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <name>Store :: RocksDB</name>
-    <description>The implementation of store based on RocksDB </description>
+    <name>Store :: MapDB</name>
+    <description>The implementation of store based on MapDB</description>
 
     <dependencies>
 
@@ -47,10 +47,10 @@
         </dependency>
 
         <dependency>
-            <groupId>net.microfalx.resource</groupId>
-            <artifactId>resource-rocksdb</artifactId>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+            <version>3.1.0</version>
         </dependency>
-
 
     </dependencies>
 

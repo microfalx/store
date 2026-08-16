@@ -60,6 +60,7 @@
     <modules>
         <module>api</module>
         <module>core</module>
+        <module>mapdb</module>
         <module>rocksdb</module>
         <module>bom</module>
     </modules>

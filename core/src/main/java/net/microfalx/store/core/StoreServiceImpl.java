@@ -81,9 +81,14 @@ public class StoreServiceImpl implements StoreService, Initializable, Releasable
         requireNonNull(options);
         LOGGER.info("Register store '{}', retention '{}'", options.getName(), formatDuration(options.getRetention()));
         Resource resource = getDirectory().resolve(options.getId(), Resource.Type.DIRECTORY);
-        Store<T, ID> store = (Store<T, ID>) storeFactory.create(options, resource);
-        stores.put(options.getId(), store);
-        return store;
+        try {
+            Store<T, ID> store = (Store<T, ID>) storeFactory.create(options, resource);
+            stores.put(options.getId(), store);
+            return store;
+        } catch (Exception e) {
+            throw new StoreException("Failed to register store '" + options.getName()
+                    + "', directory '" + resource.toURI() + "'", e);
+        }
     }
 
     @Override

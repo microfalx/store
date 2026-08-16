@@ -20,11 +20,11 @@ import static net.microfalx.lang.StringUtils.toIdentifier;
 public interface Store<T extends Identifiable<ID>, ID> extends Identifiable<String>, Nameable, Iterable<T> {
 
     /**
-     * Returns the directory used to store data.
+     * Returns the resource (file or directory) used to store data.
      *
      * @return a non-null instance
      */
-    Resource getDirectory();
+    Resource getResource();
 
     /**
      * Returns the store options.

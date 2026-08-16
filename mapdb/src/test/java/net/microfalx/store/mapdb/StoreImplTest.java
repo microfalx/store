@@ -1,4 +1,4 @@
-package net.microfalx.store.rocksdb;
+package net.microfalx.store.mapdb;
 
 import net.microfalx.lang.JvmUtils;
 import net.microfalx.resource.Resource;
@@ -22,13 +22,13 @@ class StoreImplTest {
     void setup() {
         storeFactory = new StoreFactoryImpl<>();
         storeFactory.initialize();
-        File directory = new File(JvmUtils.getTemporaryDirectory(), "rocksdb_" + Long.toHexString(System.currentTimeMillis()));
+        File directory = new File(JvmUtils.getTemporaryDirectory(), "mapdb_" + Long.toHexString(System.currentTimeMillis()));
         store = storeFactory.create(Store.Options.create("test"), Resource.directory(directory));
     }
 
     @Test
     void service() {
-        Store<TestItem, String> store = StoreService.getInstance().register(Store.Options.create("rocksb"));
+        Store<TestItem, String> store = StoreService.getInstance().register(Store.Options.create("mapdb"));
         assertNull(store.find("1"));
         store.add(new TestItem("1", "John", "Doe", 30));
         assertNotNull(store.find("1"));
@@ -40,8 +40,8 @@ class StoreImplTest {
         assertNotNull(store.getResource());
         assertEquals(0, store.count(Store.Location.MEMORY));
         assertEquals(0, store.count(Store.Location.DISK));
-        Assertions.assertThat(store.size(Store.Location.MEMORY)).isGreaterThan(1000);
-        Assertions.assertThat(store.size(Store.Location.DISK)).isGreaterThanOrEqualTo(0);
+        Assertions.assertThat(store.size(Store.Location.MEMORY)).isGreaterThanOrEqualTo(0);
+        Assertions.assertThat(store.size(Store.Location.DISK)).isGreaterThanOrEqualTo(1000);
     }
 
     @Test

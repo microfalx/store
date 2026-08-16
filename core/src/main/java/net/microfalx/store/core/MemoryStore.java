@@ -98,5 +98,10 @@ public class MemoryStore<T extends Identifiable<ID>, ID> extends AbstractStore<T
         public Store<T, ID> create(Store.Options options, Resource directory) {
             return new MemoryStore<>(options, directory);
         }
+
+        @Override
+        public String toString() {
+            return "Memory Store Factory";
+        }
     }
 }

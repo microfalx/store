@@ -5,6 +5,8 @@ import net.microfalx.lang.Hashing;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.Initializable;
 import net.microfalx.lang.StringUtils;
+import net.microfalx.lang.annotation.Order;
+import net.microfalx.lang.annotation.Provider;
 import net.microfalx.resource.Resource;
 import net.microfalx.resource.rocksdb.RocksDbManager;
 import net.microfalx.store.api.Store;
@@ -22,6 +24,8 @@ import static net.microfalx.lang.StringUtils.capitalizeWords;
 import static net.microfalx.lang.StringUtils.joinNames;
 
 @Slf4j
+@Provider
+@Order(Order.NORMAL + 10)
 public class StoreFactoryImpl<T extends Identifiable<ID>, ID> implements StoreFactory<T, ID>, Initializable {
 
     @Override
@@ -34,6 +38,11 @@ public class StoreFactoryImpl<T extends Identifiable<ID>, ID> implements StoreFa
         ThreadPool threadPool = ThreadPool.get();
         threadPool.execute(new DiscoverTask());
         threadPool.scheduleAtFixedRate(new DiscoverTask(), Duration.ofMinutes(5));
+    }
+
+    @Override
+    public String toString() {
+        return "RocksDB Store Factory";
     }
 
     class DiscoverTask extends AbstractRunnable {
