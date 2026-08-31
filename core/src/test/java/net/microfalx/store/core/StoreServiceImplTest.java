@@ -2,6 +2,7 @@ package net.microfalx.store.core;
 
 import net.microfalx.store.api.Query;
 import net.microfalx.store.api.Store;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +17,12 @@ class StoreServiceImplTest {
     void setup() {
         storeService = new StoreServiceImpl();
         storeService.initialize();
-        storeService.start();
         store = storeService.register(Store.Options.create("test"));
+    }
+
+    @AfterEach
+    void destroy() {
+        storeService.release();
     }
 
     @Test
@@ -45,9 +50,9 @@ class StoreServiceImplTest {
 
     @Test
     void list() {
-        assertEquals(0,store.list(Query.<TestItem>builder().build()).size());
+        assertEquals(0, store.list(Query.<TestItem>builder().build()).size());
         store.add(new TestItem("1", "John", "Doe", 30));
-        assertEquals(1,store.list(Query.<TestItem>builder().build()).size());
+        assertEquals(1, store.list(Query.<TestItem>builder().build()).size());
     }
 
 }
