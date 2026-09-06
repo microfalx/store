@@ -1,7 +1,9 @@
 package net.microfalx.store.core;
 
 import net.microfalx.lang.FormatterUtils;
+import net.microfalx.lang.annotation.SizeOf;
 
+@SizeOf
 public class StoreSettings {
 
     private long maximumMemorySize = 10 * FormatterUtils.M;

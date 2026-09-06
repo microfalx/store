@@ -7,6 +7,7 @@ import net.microfalx.lang.Initializable;
 import net.microfalx.lang.StringUtils;
 import net.microfalx.lang.annotation.Order;
 import net.microfalx.lang.annotation.Provider;
+import net.microfalx.lang.annotation.SizeOf;
 import net.microfalx.resource.Resource;
 import net.microfalx.resource.rocksdb.RocksDbManager;
 import net.microfalx.store.api.Store;
@@ -26,6 +27,7 @@ import static net.microfalx.lang.StringUtils.joinNames;
 @Slf4j
 @Provider
 @Order(Order.NORMAL + 10)
+@SizeOf
 public class StoreFactoryImpl<T extends Identifiable<ID>, ID> implements StoreFactory<T, ID>, Initializable {
 
     @Override

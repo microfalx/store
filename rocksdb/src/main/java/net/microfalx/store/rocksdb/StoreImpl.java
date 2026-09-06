@@ -4,6 +4,7 @@ import com.google.common.collect.AbstractIterator;
 import lombok.extern.slf4j.Slf4j;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.ObjectUtils;
+import net.microfalx.lang.annotation.SizeOf;
 import net.microfalx.resource.FileResource;
 import net.microfalx.resource.Resource;
 import net.microfalx.resource.rocksdb.RocksDbManager;
@@ -19,8 +20,10 @@ import static net.microfalx.store.core.StoreUtils.METRICS_FAILURES;
 import static net.microfalx.store.core.StoreUtils.getTimer;
 
 @Slf4j
+@SizeOf(shallow = false, deepSize = 64)
 public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, ID> {
 
+    @SizeOf(shallow = false, deepSize = 5000)
     private final RocksDB db;
 
     public StoreImpl(Options options, Resource resource) {

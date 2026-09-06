@@ -4,6 +4,7 @@ import com.google.common.collect.AbstractIterator;
 import lombok.extern.slf4j.Slf4j;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.ObjectUtils;
+import net.microfalx.lang.annotation.SizeOf;
 import net.microfalx.resource.Resource;
 import net.microfalx.resource.ResourceUtils;
 import net.microfalx.store.api.StoreException;
@@ -20,11 +21,14 @@ import static net.microfalx.lang.ArgumentUtils.requireNonNull;
 import static net.microfalx.store.core.StoreUtils.getTimer;
 
 @Slf4j
+@SizeOf(shallow = false, deepSize = 64)
 public class StoreImpl<T extends Identifiable<ID>, ID> extends AbstractStore<T, ID> {
 
     private static final String DEFAULT_MAP = "default";
 
+    @SizeOf(shallow = false, deepSize = 5000)
     private final DB db;
+    @SizeOf
     private final Map<String, byte[]> map;
 
     public StoreImpl(Options options, Resource resource) {

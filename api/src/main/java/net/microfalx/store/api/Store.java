@@ -4,6 +4,7 @@ import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.Nameable;
 import net.microfalx.lang.StringUtils;
 import net.microfalx.lang.Timestampable;
+import net.microfalx.lang.annotation.SizeOf;
 import net.microfalx.resource.Resource;
 
 import java.time.Duration;
@@ -133,6 +134,7 @@ public interface Store<T extends Identifiable<ID>, ID> extends Identifiable<Stri
     /**
      * Options for store.
      */
+    @SizeOf(shallow = false, deepSize = 100)
     final class Options implements Identifiable<String>, Nameable, Cloneable {
 
         private final String id;

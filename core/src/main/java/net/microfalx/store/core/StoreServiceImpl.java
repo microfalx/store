@@ -3,6 +3,7 @@ package net.microfalx.store.core;
 import lombok.extern.slf4j.Slf4j;
 import net.microfalx.lang.*;
 import net.microfalx.lang.annotation.Provider;
+import net.microfalx.lang.annotation.SizeOf;
 import net.microfalx.resource.Resource;
 import net.microfalx.store.api.Store;
 import net.microfalx.store.api.StoreException;
@@ -29,7 +30,7 @@ import static net.microfalx.lang.StringUtils.toIdentifier;
 @Slf4j
 public class StoreServiceImpl implements StoreService, Initializable, Releasable {
 
-    private volatile StoreSettings settings = new StoreSettings();
+    @SizeOf private volatile StoreSettings settings = new StoreSettings();
 
     private ThreadPool threadPool = ThreadPool.get();
 

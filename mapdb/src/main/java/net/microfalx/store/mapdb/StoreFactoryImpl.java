@@ -1,11 +1,11 @@
 package net.microfalx.store.mapdb;
 
-import com.google.common.base.MoreObjects;
 import lombok.extern.slf4j.Slf4j;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.Initializable;
 import net.microfalx.lang.annotation.Order;
 import net.microfalx.lang.annotation.Provider;
+import net.microfalx.lang.annotation.SizeOf;
 import net.microfalx.resource.Resource;
 import net.microfalx.store.api.Store;
 import net.microfalx.store.api.StoreFactory;
@@ -13,6 +13,7 @@ import net.microfalx.store.api.StoreFactory;
 @Slf4j
 @Provider
 @Order(Order.NORMAL + 20)
+@SizeOf
 public class StoreFactoryImpl<T extends Identifiable<ID>, ID> implements StoreFactory<T, ID>, Initializable {
 
     @Override
