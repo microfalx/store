@@ -3,17 +3,13 @@ package net.microfalx.store.core;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.google.common.collect.AbstractIterator;
 import net.microfalx.lang.Identifiable;
-import net.microfalx.lang.ObjectUtils;
 import net.microfalx.lang.TimeUtils;
 import net.microfalx.lang.Timestampable;
 import net.microfalx.resource.Resource;
 import net.microfalx.store.api.Query;
 import net.microfalx.store.api.Store;
 import net.microfalx.store.api.StoreException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,8 +26,6 @@ import static net.microfalx.lang.ArgumentUtils.requireNonNull;
 import static net.microfalx.store.core.StoreUtils.*;
 
 public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements Store<T, ID> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStore.class);
 
     static private final ThreadLocal<Kryo> KRYOS = new ThreadLocal<Kryo>() {
         protected Kryo initialValue() {
