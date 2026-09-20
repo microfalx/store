@@ -85,7 +85,7 @@ public class StoreServiceImpl implements StoreService, Initializable, Releasable
         Resource resource = getDirectory().resolve(options.getId(), Resource.Type.DIRECTORY);
         try {
             Store<T, ID> store = (Store<T, ID>) storeFactory.create(options, resource);
-            stores.put(options.getId(), store);
+            register(store);
             return store;
         } catch (Exception e) {
             throw new StoreException("Failed to register store '" + options.getName()
@@ -98,6 +98,9 @@ public class StoreServiceImpl implements StoreService, Initializable, Releasable
         requireNonNull(store);
         LOGGER.info("Register external store '{}', retention '{}'", store.getName(), formatDuration(store.getOptions().getRetention()));
         stores.putIfAbsent(store.getId(), store);
+        if (store instanceof AbstractStore<T, ID> abstractStore) {
+            abstractStore.storeService = this;
+        }
         return store;
     }
 
