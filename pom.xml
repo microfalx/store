@@ -79,6 +79,7 @@
         <resource.version>1.0.4-SNAPSHOT</resource.version>
         <metrics.version>1.0.3-SNAPSHOT</metrics.version>
         <tracing.version>1.0.2-SNAPSHOT</tracing.version>
+        <service.version>1.0.0-SNAPSHOT</service.version>
         <threadpool.version>1.0.2-SNAPSHOT</threadpool.version>
 
         <jacoco.file>jacoco.exec</jacoco.file>
@@ -132,6 +133,14 @@
                 <groupId>net.microfalx.resource</groupId>
                 <artifactId>resource-bom</artifactId>
                 <version>${resource.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.microfalx.service</groupId>
+                <artifactId>service-bom</artifactId>
+                <version>${service.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

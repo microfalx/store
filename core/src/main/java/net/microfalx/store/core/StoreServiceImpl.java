@@ -3,7 +3,7 @@ package net.microfalx.store.core;
 import net.microfalx.lang.*;
 import net.microfalx.lang.annotation.Provider;
 import net.microfalx.lang.annotation.SizeOf;
-import net.microfalx.lang.service.Logger;
+import net.microfalx.service.api.Logger;
 import net.microfalx.resource.Resource;
 import net.microfalx.store.api.Store;
 import net.microfalx.store.api.StoreException;
@@ -29,7 +29,7 @@ import static net.microfalx.lang.StringUtils.toIdentifier;
 @Provider
 public class StoreServiceImpl implements StoreService, Initializable, Releasable {
 
-    private static final net.microfalx.lang.service.Logger LOGGER = Logger.get(StoreServiceImpl.class);
+    private static final net.microfalx.service.api.Logger LOGGER = Logger.get(StoreServiceImpl.class);
 
     @SizeOf private volatile StoreSettings settings = new StoreSettings();
 

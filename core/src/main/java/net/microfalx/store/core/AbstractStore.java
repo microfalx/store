@@ -6,8 +6,8 @@ import com.esotericsoftware.kryo.io.Output;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.TimeUtils;
 import net.microfalx.lang.Timestampable;
-import net.microfalx.lang.service.Service;
-import net.microfalx.lang.service.ServiceLocator;
+import net.microfalx.service.api.Service;
+import net.microfalx.service.api.ServiceLocator;
 import net.microfalx.resource.Resource;
 import net.microfalx.store.api.Query;
 import net.microfalx.store.api.Store;
@@ -76,7 +76,7 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
             byte[] data = serialize(item);
             writeContent(item.getId(), data);
         });
-        ServiceLocator.report(storeService, Service.Metric.EVENT_IN);
+        storeService.report(Service.Metric.EVENT_IN);
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
     @Override
     public T find(ID id) {
         requireNonNull(id);
-        ServiceLocator.report(storeService, Service.Metric.SUCCESS);
+        storeService.report(Service.Metric.SUCCESS);
         return getTimer(StoreUtils.FIND_ACTION, this).record(() -> {
             byte[] data = readData(id);
             if (data == null) {
@@ -111,7 +111,7 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
     @Override
     public Collection<T> list(Query<T> query) {
         Collection<T> objects = new ArrayList<>();
-        ServiceLocator.report(storeService, Service.Metric.SUCCESS);
+        storeService.report(Service.Metric.SUCCESS);
         walk(query, t -> {
             objects.add(t);
             return true;
@@ -123,7 +123,7 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
     public void walk(Query<T> query, Function<T, Boolean> callback) {
         requireNonNull(query);
         requireNonNull(callback);
-        ServiceLocator.report(storeService, Service.Metric.SUCCESS);
+        storeService.report(Service.Metric.SUCCESS);
         LocalDateTime start = query.getStart();
         LocalDateTime end = query.getEnd();
         Predicate<T> filter = query.getFilter();

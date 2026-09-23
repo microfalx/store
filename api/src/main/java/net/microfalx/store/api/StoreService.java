@@ -1,7 +1,7 @@
 package net.microfalx.store.api;
 
 import net.microfalx.lang.Identifiable;
-import net.microfalx.lang.service.Service;
+import net.microfalx.service.api.Service;
 import net.microfalx.resource.Resource;
 
 import java.util.Collection;

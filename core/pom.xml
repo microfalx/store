@@ -31,7 +31,7 @@
     </parent>
 
     <name>Store :: CORE</name>
-    <description>The API</description>
+    <description>The core module</description>
 
     <dependencies>
 
@@ -39,6 +39,11 @@
             <groupId>net.microfalx.store</groupId>
             <artifactId>store-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.microfalx.service</groupId>
+            <artifactId>service-core</artifactId>
         </dependency>
 
         <dependency>
