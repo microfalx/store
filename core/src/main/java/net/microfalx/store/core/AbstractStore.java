@@ -3,6 +3,7 @@ package net.microfalx.store.core;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.TimeUtils;
 import net.microfalx.lang.Timestampable;
+import net.microfalx.lang.Serde;
 import net.microfalx.resource.Resource;
 import net.microfalx.service.api.Service;
 import net.microfalx.store.api.Query;
@@ -164,11 +165,11 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
     @SuppressWarnings("unchecked")
     protected final T deserialize(byte[] data) {
         if (data == null) return null;
-        return (T) KryoSerde.deserialize(data);
+        return (T) Serde.deserialize(data);
     }
 
     protected final byte[] serialize(T item) {
-        return KryoSerde.serialize(item);
+        return Serde.serialize(item);
     }
 
     protected abstract byte[] doReadData(ID id) throws Exception;

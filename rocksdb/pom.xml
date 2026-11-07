@@ -42,11 +42,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>net.microfalx.resource</groupId>
             <artifactId>resource-rocksdb</artifactId>
         </dependency>
