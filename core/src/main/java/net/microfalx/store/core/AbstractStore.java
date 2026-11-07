@@ -1,20 +1,14 @@
 package net.microfalx.store.core;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import net.microfalx.lang.Identifiable;
 import net.microfalx.lang.TimeUtils;
 import net.microfalx.lang.Timestampable;
-import net.microfalx.service.api.Service;
-import net.microfalx.service.api.ServiceLocator;
 import net.microfalx.resource.Resource;
+import net.microfalx.service.api.Service;
 import net.microfalx.store.api.Query;
 import net.microfalx.store.api.Store;
 import net.microfalx.store.api.StoreException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
@@ -30,14 +24,6 @@ import static net.microfalx.store.core.StoreUtils.*;
 public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements Store<T, ID> {
 
     volatile StoreServiceImpl storeService;
-
-    static private final ThreadLocal<Kryo> KRYOS = new ThreadLocal<Kryo>() {
-        protected Kryo initialValue() {
-            Kryo kryo = new Kryo();
-            kryo.setRegistrationRequired(false);
-            return kryo;
-        }
-    };
 
     private final Resource resource;
     private final Store.Options options;
@@ -178,20 +164,11 @@ public abstract class AbstractStore<T extends Identifiable<ID>, ID> implements S
     @SuppressWarnings("unchecked")
     protected final T deserialize(byte[] data) {
         if (data == null) return null;
-        Kryo kryo = KRYOS.get();
-        ByteArrayInputStream buffer = new ByteArrayInputStream(data);
-        Input input = new Input(buffer);
-        return (T) kryo.readClassAndObject(input);
+        return (T) KryoSerde.deserialize(data);
     }
 
     protected final byte[] serialize(T item) {
-        if (item == null) return null;
-        Kryo kryo = KRYOS.get();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        Output output = new Output(buffer);
-        kryo.writeClassAndObject(output, item);
-        output.close();
-        return buffer.toByteArray();
+        return KryoSerde.serialize(item);
     }
 
     protected abstract byte[] doReadData(ID id) throws Exception;
